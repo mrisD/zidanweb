@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <link rel="icon" href="../static/images/icoimg.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>弹药价格追踪系统</title>
@@ -116,6 +117,7 @@
     <div class="container">
         <h1>弹药价格追踪系统(v 1.0 内测)</h1>
         <p>免责声明:本站数据仅供内部使用不用做商业用途</p>
+        <p><a href="http://sanjiaozhouzidanmrding.w1.luyouxia.net/diyzhanbei">DIY凑战备系统</a></p>
         <div id="data-container">
             <!-- 数据将通过JavaScript动态加载 -->
         </div>
@@ -218,53 +220,150 @@
         }
 
         // 渲染分页
-        function renderPagination() {
-            const pagination = document.getElementById('pagination');
-            pagination.innerHTML = '';
+<!--        function renderPagination() {-->
+<!--            const pagination = document.getElementById('pagination');-->
+<!--            pagination.innerHTML = '';-->
 
-            const pageCount = Math.ceil(allAmmoData.length / itemsPerPage);
+<!--            const pageCount = Math.ceil(allAmmoData.length / itemsPerPage);-->
 
-            // 上一页按钮
-            const prevButton = document.createElement('button');
-            prevButton.textContent = '上一页';
-            prevButton.disabled = currentPage === 1;
-            prevButton.addEventListener('click', function() {
-                if (currentPage > 1) {
-                    currentPage--;
-                    renderAmmoList();
-                    renderPagination();
-                }
-            });
-            pagination.appendChild(prevButton);
+<!--            // 上一页按钮-->
+<!--            const prevButton = document.createElement('button');-->
+<!--            prevButton.textContent = '上一页';-->
+<!--            prevButton.disabled = currentPage === 1;-->
+<!--            prevButton.addEventListener('click', function() {-->
+<!--                if (currentPage > 1) {-->
+<!--                    currentPage&#45;&#45;;-->
+<!--                    renderAmmoList();-->
+<!--                    renderPagination();-->
+<!--                }-->
+<!--            });-->
+<!--            pagination.appendChild(prevButton);-->
 
-            // 页码按钮
-            for (let i = 1; i <= pageCount; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.textContent = i;
-                if (i === currentPage) {
-                    pageButton.className = 'active';
-                }
-                pageButton.addEventListener('click', function() {
-                    currentPage = i;
-                    renderAmmoList();
-                    renderPagination();
-                });
-                pagination.appendChild(pageButton);
-            }
+<!--            // 页码按钮-->
+<!--            for (let i = 1; i <= pageCount; i++) {-->
+<!--                const pageButton = document.createElement('button');-->
+<!--                pageButton.textContent = i;-->
+<!--                if (i === currentPage) {-->
+<!--                    pageButton.className = 'active';-->
+<!--                }-->
+<!--                pageButton.addEventListener('click', function() {-->
+<!--                    currentPage = i;-->
+<!--                    renderAmmoList();-->
+<!--                    renderPagination();-->
+<!--                });-->
+<!--                pagination.appendChild(pageButton);-->
+<!--            }-->
 
-            // 下一页按钮
-            const nextButton = document.createElement('button');
-            nextButton.textContent = '下一页';
-            nextButton.disabled = currentPage === pageCount;
-            nextButton.addEventListener('click', function() {
-                if (currentPage < pageCount) {
-                    currentPage++;
-                    renderAmmoList();
-                    renderPagination();
-                }
-            });
-            pagination.appendChild(nextButton);
+<!--            // 下一页按钮-->
+<!--            const nextButton = document.createElement('button');-->
+<!--            nextButton.textContent = '下一页';-->
+<!--            nextButton.disabled = currentPage === pageCount;-->
+<!--            nextButton.addEventListener('click', function() {-->
+<!--                if (currentPage < pageCount) {-->
+<!--                    currentPage++;-->
+<!--                    renderAmmoList();-->
+<!--                    renderPagination();-->
+<!--                }-->
+<!--            });-->
+<!--            pagination.appendChild(nextButton);-->
+<!--        }-->
+
+
+        // 渲染分页
+function renderPagination() {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    const pageCount = Math.ceil(allAmmoData.length / itemsPerPage);
+
+    // 上一页按钮
+    const prevButton = document.createElement('button');
+    prevButton.textContent = '上一页';
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderAmmoList();
+            renderPagination();
         }
+    });
+    pagination.appendChild(prevButton);
+
+    // 计算页码范围
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(pageCount, startPage + 4);
+
+    // 如果不足 5 页，向前补齐
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
+
+    // 首页省略号
+    if (startPage > 1) {
+        const firstPage = document.createElement('button');
+        firstPage.textContent = '1';
+        firstPage.addEventListener('click', function() {
+            currentPage = 1;
+            renderAmmoList();
+            renderPagination();
+        });
+        pagination.appendChild(firstPage);
+
+        if (startPage > 2) {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '...';
+            ellipsis.style.margin = '0 5px';
+            pagination.appendChild(ellipsis);
+        }
+    }
+
+    // 渲染中间页码
+    for (let i = startPage; i <= endPage; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        if (i === currentPage) {
+            pageButton.className = 'active';
+        }
+        pageButton.addEventListener('click', function() {
+            currentPage = i;
+            renderAmmoList();
+            renderPagination();
+        });
+        pagination.appendChild(pageButton);
+    }
+
+    // 末页省略号
+    if (endPage < pageCount) {
+        if (endPage < pageCount - 1) {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '...';
+            ellipsis.style.margin = '0 5px';
+            pagination.appendChild(ellipsis);
+        }
+
+        const lastPage = document.createElement('button');
+        lastPage.textContent = pageCount;
+        lastPage.addEventListener('click', function() {
+            currentPage = pageCount;
+            renderAmmoList();
+            renderPagination();
+        });
+        pagination.appendChild(lastPage);
+    }
+
+    // 下一页按钮
+    const nextButton = document.createElement('button');
+    nextButton.textContent = '下一页';
+    nextButton.disabled = currentPage === pageCount;
+    nextButton.addEventListener('click', function() {
+        if (currentPage < pageCount) {
+            currentPage++;
+            renderAmmoList();
+            renderPagination();
+        }
+    });
+    pagination.appendChild(nextButton);
+}
 
         // 渲染价格图表
         function renderPriceChart(ammoData) {

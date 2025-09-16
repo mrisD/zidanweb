@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="../static/images/icoimg.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>战备值计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+            color: #333;
+        }
+
+        .modern-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .p-6 {
+            padding: 24px;
+        }
+
+        .mb-6 {
+            margin-bottom: 24px;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        .section-title div {
+            align-items: center;
+        }
+
+        .text-sm {
+            font-size: 14px;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
+
+        .text-red-600 {
+            color: #e53e3e;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+
+        .switch-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .switch-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            margin-right: 12px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .slider.round {
+            border-radius: 26px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        .modern-badge {
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modern-badge:hover {
+            background-color: #3182ce;
+        }
+
+        .badge-primary {
+            background-color: #4299e1;
+        }
+
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .result-header {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="modern-card p-6 mb-6 fade-in-up">
+        <div class="section-title">
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <div>🔒 自定义配置</div>
+                <a href="/sjz/v/zb_top" target="_blank" class="text-sm font-bold text-red-600">《实时假账排行榜》</a>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>战备值（点击下拉选择）</label>
+            <select class="form-control" id="targetValue">
+                <option value="112500">【11W】机密</option>
+                <option value="187500">【18W】机密</option>
+                <option value="350000">【35W】绝密巴克什</option>
+                <option value="450000">【45W】绝密航天</option>
+                <option value="780000">【78W】绝密监狱</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>当前战备值：【<span id="currentValueDisplay">0</span>】</label>
+            <input type="number" id="currentValue" placeholder="请输入当前战备值" oninput="updateDifference()">
+        </div>
+
+        <div class="form-group">
+            <label>差值: <span id="differenceValue">0</span></label>
+        </div>
+
+        <div class="form-group">
+            <label>你的空余槽位</label>
+        </div>
+
+        <div class="switch-group">
+            <div class="switch-item">
+                <label class="switch">
+                    <input type="checkbox" id="gun">
+                    <span class="slider round"></span>
+                </label>
+                <span style="cursor: pointer;">枪械和配件</span>
+            </div>
+
+            <div class="switch-item">
+                <label class="switch">
+                    <input type="checkbox" id="helmet">
+                    <span class="slider round"></span>
+                </label>
+                <span style="cursor: pointer;">头盔</span>
+            </div>
+
+            <div class="switch-item">
+                <label class="switch">
+                    <input type="checkbox" id="armor">
+                    <span class="slider round"></span>
+                </label>
+                <span style="cursor: pointer;">护甲</span>
+            </div>
+
+            <div class="switch-item">
+                <label class="switch">
+                    <input type="checkbox" id="chest">
+                    <span class="slider round"></span>
+                </label>
+                <span style="cursor: pointer;">胸挂</span>
+            </div>
+
+            <div class="switch-item">
+                <label class="switch">
+                    <input type="checkbox" id="backpack">
+                    <span class="slider round"></span>
+                </label>
+                <span style="cursor: pointer;">背包</span>
+            </div>
+
+            <div class="switch-item">
+                <label class="switch">
+                    <input type="checkbox" id="pistol">
+                    <span class="slider round"></span>
+                </label>
+                <span style="cursor: pointer;">手枪</span>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>计算中...</p>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="modern-badge badge-primary" style="width: 80%; height: 40px; cursor: pointer; font-size: 16px;" onclick="calculate()">计算</button>
+        </div>
+
+        <div class="result-container" id="resultContainer">
+            <div class="result-header">计算结果</div>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        function updateDifference() {
+            const currentValue = parseInt(document.getElementById('currentValue').value) || 0;
+            const targetValue = parseInt(document.getElementById('targetValue').value);
+
+            document.getElementById('currentValueDisplay').textContent = currentValue;
+            document.getElementById('differenceValue').textContent = targetValue - currentValue;
+        }
+
+        function calculate() {
+        // 显示加载动画
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('resultContainer').style.display = 'none';
+
+        // 收集表单数据
+        const targetValue = parseInt(document.getElementById('targetValue').value);
+        const currentValue = parseInt(document.getElementById('currentValue').value) || 0;
+
+        const slots = {
+            gun: document.getElementById('gun').checked,
+            helmet: document.getElementById('helmet').checked,
+            armor: document.getElementById('armor').checked,
+            chest: document.getElementById('chest').checked,
+            backpack: document.getElementById('backpack').checked,
+            pistol: document.getElementById('pistol').checked
+        };
+
+        // 发送数据到后端
+        fetch('http://sanjiaozhouzidanmrding.w1.luyouxia.net/calculate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                targetValue: targetValue,
+                currentValue: currentValue,
+                slots: slots
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // 隐藏加载动画
+            document.getElementById('loading').style.display = 'none';
+            console.log('11111');
+            console.log(data);
+            console.log('11111');
+            // 显示结果
+            displayResult(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loading').style.display = 'none';
+            alert('计算失败，请检查后端服务是否启动');
+        });
+    }
+
+        function displayResult(data) {
+        console.log('Received data:', data);
+        const resultContainer = document.getElementById('resultContainer');
+        const resultContent = document.getElementById('resultContent');
+
+        // 清空之前的结果
+        resultContent.innerHTML = '';
+
+        // 检查数据结构是否正确
+        if (!data || typeof data !== 'object') {
+            resultContent.innerHTML = '<div class="result-item">返回数据格式错误</div>';
+            resultContainer.style.display = 'block';
+            return;
+        }
+
+        // 添加总体信息
+        const overallInfo = `
+            <div class="result-item">
+                <strong>名称:</strong> ${data.name || '未知'}<br>
+                <strong>战备值:</strong> ${data.jz || 0}<br>
+                <strong>价格:</strong> ${data.price || 0}<br>
+                <strong>差值:</strong> ${data.cz || 0}
+            </div>
+        `;
+
+        // 添加装备详情 - 修复了data.data的问题
+        let equipmentInfo = '';
+
+        // 检查是否有装备数据
+        if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+            equipmentInfo = '<div class="result-header">推荐装备</div>';
+
+            data.data.forEach(item => {
+                // 根据jiazhang值显示不同的加成状态
+                const jiazhangText = item.jiazhang === 1 ? "有" : "无";
+
+                equipmentInfo += `
+                    <div class="result-item">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <img src="${item.pic || ''}" alt="${item.name || '未知'}" style="width: 60px; height: 60px; margin-right: 10px; object-fit: contain;">
+                            <div>
+                                <strong>${item.name || '未知物品'}</strong> (${item.type || '未知类型'})<br>
+                                <span class="grade-badge">等级 ${item.grade || 0}</span>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div><strong>价格:</strong> ${item.price ? item.price.toLocaleString() : 0}</div>
+                            <div><strong>战备值:</strong> ${item.jz > 0 ? '+' : ''}${item.jz || 0}</div>
+                            <div><strong>加成:</strong> ${item.bl > 0 ? '+' : ''}${item.bl || 0}</div>
+                            <div><strong>假账:</strong> ${jiazhangText}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            equipmentInfo = '<div class="result-item">无推荐装备数据</div>';
+        }
+
+        resultContent.innerHTML = overallInfo + equipmentInfo;
+        resultContainer.style.display = 'block';
+    }
+
+    // 初始化
+    document.getElementById('targetValue').addEventListener('change', updateDifference);
+    </script>
+</body>
+</html>

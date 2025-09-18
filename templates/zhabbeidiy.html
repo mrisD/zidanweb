@@ -238,226 +238,297 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .captcha-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #e2e8f0;
+        }
+
+        .captcha-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .captcha-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .captcha-img {
+            height: 40px;
+            margin-left: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .captcha-refresh {
+            margin-left: 8px;
+            color: #4299e1;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .verify-btn {
+            background-color: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .verify-btn:hover {
+            background-color: #38a169;
+        }
+
+        .verify-btn:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .captcha-status {
+            margin-top: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .status-success {
+            color: #38a169;
+        }
+
+        .status-error {
+            color: #e53e3e;
+        }
     </style>
 </head>
 <body>
-    <div class="modern-card p-6 mb-6 fade-in-up">
-        <div class="section-title">
-            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                <div>🔒 自定义配置</div>
-                <a href="/sjz/v/zb_top" target="_blank" class="text-sm font-bold text-red-600">《实时假账排行榜》</a>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>战备值（点击下拉选择）</label>
-            <select class="form-control" id="targetValue">
-                <option value="112500">【11W】机密</option>
-                <option value="187500">【18W】机密</option>
-                <option value="350000">【35W】绝密巴克什</option>
-                <option value="450000">【45W】绝密航天</option>
-                <option value="780000">【78W】绝密监狱</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>当前战备值：【<span id="currentValueDisplay">0</span>】</label>
-            <input type="number" id="currentValue" placeholder="请输入当前战备值" oninput="updateDifference()">
-        </div>
-
-        <div class="form-group">
-            <label>差值: <span id="differenceValue">0</span></label>
-        </div>
-
-        <div class="form-group">
-            <label>你的空余槽位</label>
-        </div>
-
-        <div class="switch-group">
-            <div class="switch-item">
-                <label class="switch">
-                    <input type="checkbox" id="gun">
-                    <span class="slider round"></span>
-                </label>
-                <span style="cursor: pointer;">枪械和配件</span>
-            </div>
-
-            <div class="switch-item">
-                <label class="switch">
-                    <input type="checkbox" id="helmet">
-                    <span class="slider round"></span>
-                </label>
-                <span style="cursor: pointer;">头盔</span>
-            </div>
-
-            <div class="switch-item">
-                <label class="switch">
-                    <input type="checkbox" id="armor">
-                    <span class="slider round"></span>
-                </label>
-                <span style="cursor: pointer;">护甲</span>
-            </div>
-
-            <div class="switch-item">
-                <label class="switch">
-                    <input type="checkbox" id="chest">
-                    <span class="slider round"></span>
-                </label>
-                <span style="cursor: pointer;">胸挂</span>
-            </div>
-
-            <div class="switch-item">
-                <label class="switch">
-                    <input type="checkbox" id="backpack">
-                    <span class="slider round"></span>
-                </label>
-                <span style="cursor: pointer;">背包</span>
-            </div>
-
-            <div class="switch-item">
-                <label class="switch">
-                    <input type="checkbox" id="pistol">
-                    <span class="slider round"></span>
-                </label>
-                <span style="cursor: pointer;">手枪</span>
-            </div>
-        </div>
-
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>计算中...</p>
-        </div>
-
-        <div style="text-align: center;">
-            <button class="modern-badge badge-primary" style="width: 80%; height: 40px; cursor: pointer; font-size: 16px;" onclick="calculate()">计算</button>
-        </div>
-
-        <div class="result-container" id="resultContainer">
-            <div class="result-header">计算结果</div>
-            <div id="resultContent"></div>
+<div class="modern-card p-6 mb-6 fade-in-up">
+    <div class="section-title">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
+            <div>🔒 自定义配置</div>
+            <a href="/sjz/v/zb_top" target="_blank" class="text-sm font-bold text-red-600">《实时假账排行榜》</a>
         </div>
     </div>
 
-    <script>
-        function updateDifference() {
-            const currentValue = parseInt(document.getElementById('currentValue').value) || 0;
-            const targetValue = parseInt(document.getElementById('targetValue').value);
+    <!-- 原有表单部分保持不变 -->
+    <div class="form-group">
+        <label>战备值（点击下拉选择）</label>
+        <select class="form-control" id="targetValue">
+            <option value="112500">【11W】机密</option>
+            <option value="187500">【18W】机密</option>
+            <option value="350000">【35W】绝密巴克什</option>
+            <option value="450000">【45W】绝密航天</option>
+            <option value="780000">【78W】绝密监狱</option>
+        </select>
+    </div>
 
-            document.getElementById('currentValueDisplay').textContent = currentValue;
-            document.getElementById('differenceValue').textContent = targetValue - currentValue;
+    <div class="form-group">
+        <label>当前战备值：【<span id="currentValueDisplay">0</span>】</label>
+        <input type="number" id="currentValue" placeholder="请输入当前战备值" oninput="updateDifference()">
+    </div>
+
+    <div class="form-group">
+        <label>差值: <span id="differenceValue">0</span></label>
+    </div>
+
+    <!-- 空余槽位 -->
+    <div class="form-group"><label>你的空余槽位</label></div>
+    <div class="switch-group">
+        <!-- 这里的checkbox保持不变 -->
+        <div class="switch-item"><label class="switch"><input type="checkbox" id="gun"><span class="slider round"></span></label>枪械和配件</div>
+        <div class="switch-item"><label class="switch"><input type="checkbox" id="helmet"><span class="slider round"></span></label>头盔</div>
+        <div class="switch-item"><label class="switch"><input type="checkbox" id="armor"><span class="slider round"></span></label>护甲</div>
+        <div class="switch-item"><label class="switch"><input type="checkbox" id="chest"><span class="slider round"></span></label>胸挂</div>
+        <div class="switch-item"><label class="switch"><input type="checkbox" id="backpack"><span class="slider round"></span></label>背包</div>
+        <div class="switch-item"><label class="switch"><input type="checkbox" id="pistol"><span class="slider round"></span></label>手枪</div>
+    </div>
+
+    <!-- 验证码区域：去掉“验证”按钮 -->
+    <div class="captcha-container" id="captchaContainer" style="display:none;">
+        <div class="captcha-group">
+            <input type="text" class="captcha-input" id="captchaInput" placeholder="请输入验证码">
+            <img id="captchaImage" class="captcha-img" src="" alt="验证码" onclick="refreshCaptcha()">
+            <span class="captcha-refresh" onclick="refreshCaptcha()">刷新</span>
+        </div>
+        <div class="captcha-status" id="captchaStatus"></div>
+    </div>
+
+    <!-- 计算按钮 -->
+    <div style="text-align:center;">
+        <button class="modern-badge badge-primary"
+                style="width:80%;height:40px;cursor:pointer;font-size:16px;"
+                onclick="calculate()">计算</button>
+    </div>
+
+    <!-- 结果显示 -->
+    <div class="loading" id="loading"><div class="spinner"></div><p>计算中...</p></div>
+    <div class="result-container" id="resultContainer">
+        <div class="result-header">计算结果</div>
+        <div id="resultContent"></div>
+    </div>
+</div>
+
+<script>
+let captchaKey = '';
+
+// 页面加载即拉取验证码
+document.addEventListener('DOMContentLoaded', () => {
+    getCaptcha();
+});
+
+// 获取验证码
+async function getCaptcha() {
+    try {
+        const res = await fetch('https://www.acgice.com/api/captcha');
+        const data = await res.json();
+        if (data.code === 0) {
+            document.getElementById('captchaImage').src = data.data.captcha;
+            captchaKey = data.data.key;
+            document.getElementById('captchaContainer').style.display = 'block';
+            document.getElementById('captchaInput').value = '';
+            document.getElementById('captchaStatus').textContent = '';
+        } else {
+            console.error('获取验证码失败:', data.message);
         }
+    } catch (err) {
+        console.error('获取验证码出错:', err);
+    }
+}
+function refreshCaptcha(){ getCaptcha(); }
 
-        function calculate() {
-        // 显示加载动画
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('resultContainer').style.display = 'none';
+function updateDifference() {
+    const current = parseInt(document.getElementById('currentValue').value) || 0;
+    const target = parseInt(document.getElementById('targetValue').value);
+    document.getElementById('currentValueDisplay').textContent = current;
+    document.getElementById('differenceValue').textContent = target - current;
+}
 
-        // 收集表单数据
-        const targetValue = parseInt(document.getElementById('targetValue').value);
-        const currentValue = parseInt(document.getElementById('currentValue').value) || 0;
+function calculate() {
+    const captchaVal = document.getElementById('captchaInput').value.trim();
+    if (!captchaVal) {
+        document.getElementById('captchaStatus').textContent = '请先输入验证码';
+        document.getElementById('captchaStatus').className = 'captcha-status status-error';
+        return;
+    }
 
-        const slots = {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('resultContainer').style.display = 'none';
+
+    const payload = {
+        targetValue: parseInt(document.getElementById('targetValue').value),
+        currentValue: parseInt(document.getElementById('currentValue').value) || 0,
+        slots: {
             gun: document.getElementById('gun').checked,
             helmet: document.getElementById('helmet').checked,
             armor: document.getElementById('armor').checked,
             chest: document.getElementById('chest').checked,
             backpack: document.getElementById('backpack').checked,
             pistol: document.getElementById('pistol').checked
-        };
+        },
+        captcha: captchaVal,
+        captchaKey: captchaKey   // 关键：将验证码和key一起发后端
+    };
 
-        // 发送数据到后端
-        fetch('http://sanjiaozhouzidanmrding.w1.luyouxia.net/calculate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                targetValue: targetValue,
-                currentValue: currentValue,
-                slots: slots
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // 隐藏加载动画
-            document.getElementById('loading').style.display = 'none';
-            console.log('11111');
-            console.log(data);
-            console.log('11111');
-            // 显示结果
-            displayResult(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('loading').style.display = 'none';
-            alert('计算失败，请检查后端服务是否启动');
-        });
+    fetch('http://sanjiaozhouzidanmrding.w1.luyouxia.net/calculate', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+    })
+.then(r => {
+    // 首先检查HTTP状态码
+    if (!r.ok) {
+        throw new Error(`HTTP错误: ${r.status}`);
+    }
+    return r.json();
+})
+.then(data => {
+    document.getElementById('loading').style.display = 'none';
+    console.log(data);
+
+    // 检查后端返回的业务错误码
+    if (data.code && data.code !== 200) { // 假设200表示成功
+        alert(data.message || data.msg || '操作失败');
+        return;
     }
 
-        function displayResult(data) {
-        console.log('Received data:', data);
-        const resultContainer = document.getElementById('resultContainer');
-        const resultContent = document.getElementById('resultContent');
+    // 检查是否有msg字段（您的原有逻辑）
+    if ('msg' in data && data.msg) {
+        alert(data.msg);
+        return;
+    }
 
-        // 清空之前的结果
-        resultContent.innerHTML = '';
+    // 成功处理
+    displayResult(data);
+})
+.catch(err => {
+    console.error('Error:', err);
+    document.getElementById('loading').style.display = 'none';
 
-        // 检查数据结构是否正确
-        if (!data || typeof data !== 'object') {
-            resultContent.innerHTML = '<div class="result-item">返回数据格式错误</div>';
-            resultContainer.style.display = 'block';
-            return;
-        }
+    // 更详细的错误提示
+    if (err.message.includes('HTTP错误')) {
+        alert(`服务器错误: ${err.message}`);
+    } else if (err.message.includes('Failed to fetch')) {
+        alert('网络连接失败，请检查后端服务是否启动');
+    } else {
+        alert('计算失败: ' + err.message);
+    }
+});
+}
 
-        // 添加总体信息
-        const overallInfo = `
-            <div class="result-item">
-                <strong>名称:</strong> ${data.name || '未知'}<br>
-                <strong>战备值:</strong> ${data.jz || 0}<br>
-                <strong>价格:</strong> ${data.price || 0}<br>
-                <strong>差值:</strong> ${data.cz || 0}
-            </div>
-        `;
+function displayResult(data) {
+    const resultContainer = document.getElementById('resultContainer');
+    const resultContent   = document.getElementById('resultContent');
+    resultContent.innerHTML = '';
 
-        // 添加装备详情 - 修复了data.data的问题
-        let equipmentInfo = '';
-
-        // 检查是否有装备数据
-        if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-            equipmentInfo = '<div class="result-header">推荐装备</div>';
-
-            data.data.forEach(item => {
-                // 根据jiazhang值显示不同的加成状态
-                const jiazhangText = item.jiazhang === 1 ? "有" : "无";
-
-                equipmentInfo += `
-                    <div class="result-item">
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <img src="${item.pic || ''}" alt="${item.name || '未知'}" style="width: 60px; height: 60px; margin-right: 10px; object-fit: contain;">
-                            <div>
-                                <strong>${item.name || '未知物品'}</strong> (${item.type || '未知类型'})<br>
-                                <span class="grade-badge">等级 ${item.grade || 0}</span>
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                            <div><strong>价格:</strong> ${item.price ? item.price.toLocaleString() : 0}</div>
-                            <div><strong>战备值:</strong> ${item.jz > 0 ? '+' : ''}${item.jz || 0}</div>
-                            <div><strong>加成:</strong> ${item.bl > 0 ? '+' : ''}${item.bl || 0}</div>
-                            <div><strong>假账:</strong> ${jiazhangText}</div>
-                        </div>
-                    </div>
-                `;
-            });
-        } else {
-            equipmentInfo = '<div class="result-item">无推荐装备数据</div>';
-        }
-
-        resultContent.innerHTML = overallInfo + equipmentInfo;
+    if (!data || typeof data !== 'object') {
+        resultContent.innerHTML = '<div class="result-item">返回数据格式错误</div>';
         resultContainer.style.display = 'block';
+        return;
     }
-
-    // 初始化
-    document.getElementById('targetValue').addEventListener('change', updateDifference);
-    </script>
+    const overall = `
+        <div class="result-item">
+            <strong>名称:</strong> ${data.name || '未知'}<br>
+            <strong>战备值:</strong> ${data.jz || 0}<br>
+            <strong>价格:</strong> ${data.price || 0}<br>
+            <strong>差值:</strong> ${data.cz || 0}
+        </div>`;
+    let equip = '';
+    if (Array.isArray(data.data) && data.data.length) {
+        equip = '<div class="result-header">推荐装备</div>';
+        data.data.forEach(it => {
+            const jzText = it.jiazhang === 1 ? '有' : '无';
+            equip += `
+            <div class="result-item">
+                <div style="display:flex;align-items:center;margin-bottom:10px;">
+                    <img src="${it.pic||''}" alt="${it.name||'未知'}"
+                         style="width:60px;height:60px;margin-right:10px;object-fit:contain;">
+                    <div><strong>${it.name||'未知物品'}</strong> (${it.type||'未知'})<br>
+                        <span class="grade-badge">等级 ${it.grade||0}</span>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <div><strong>价格:</strong> ${it.price?it.price.toLocaleString():0}</div>
+                    <div><strong>战备值:</strong> ${it.jz>0?'+':''}${it.jz||0}</div>
+                    <div><strong>加成:</strong> ${it.bl>0?'+':''}${it.bl||0}</div>
+                    <div><strong>假账:</strong> ${jzText}</div>
+                </div>
+            </div>`;
+        });
+    } else {
+        equip = '<div class="result-item">无推荐装备数据</div>';
+    }
+    resultContent.innerHTML = overall + equip;
+    resultContainer.style.display = 'block';
+}
+document.getElementById('targetValue').addEventListener('change', updateDifference);
+</script>
 </body>
 </html>

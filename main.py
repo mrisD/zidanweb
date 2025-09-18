@@ -148,8 +148,8 @@ def getcalculate(requestjson):
     # 使用列表推导式更高效地构建参数字符串
     params = [f"{key_mapping[key]}={'1' if value else '0'}" for key, value in a.items()]
     st = '&' + '&'.join(params)
-    key_num, key = getimgcapth('https://www.acgice.com/api/captcha')
-    url = f"https://api.acgice.com/api/sjz/jzv3_diy?zb={str(int(requestjson['targetValue'])-int(requestjson['currentValue']))}&key={key}&key_num={key_num}{st}&token=196d54b0aed789ef9d9eae4e53f99c84&timestamp=1757659207"
+    #key_num, key = getimgcapth('https://www.acgice.com/api/captcha')
+    url = f"https://api.acgice.com/api/sjz/jzv3_diy?zb={str(int(requestjson['targetValue'])-int(requestjson['currentValue']))}&key={requestjson['captchaKey']}&key_num={requestjson['captcha']}{st}&token=196d54b0aed789ef9d9eae4e53f99c84&timestamp=1757659207"
     url = url.split('&token')[0]
     token, tim = gettoken(url.split('?')[1])
     url = url + '&token=' + token + '&timestamp=' + tim
@@ -171,13 +171,19 @@ def getcalculate(requestjson):
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0'
     }
 
-    response = requests.request("GET", url, headers=headers, data=payload).json()
+    response = requests.request("GET", url, headers=headers, data=payload)
 
-    #print(response)
-    data = fix_base64_padding(response['data'])
-    data = decrypt(data, aeskey, iv)
-    return UrlDecBase64(data.replace('非法侵入计算机信息系统罪,我方企业保留报警和起诉权利', ''))
 
+    try:
+        jsondata=response.json()
+        if jsondata['data']==[]:
+            return response.json()
+        else:
+            data = fix_base64_padding(response.json()['data'])
+            data = decrypt(data, aeskey, iv)
+            return UrlDecBase64(data.replace('非法侵入计算机信息系统罪,我方企业保留报警和起诉权利', ''))
+    except:
+            return None
 @app.route("/api/ammo")
 def get_ammo_data():
     data = [serialize_doc(doc) for doc in collection.find()]
